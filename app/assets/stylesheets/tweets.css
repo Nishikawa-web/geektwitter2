@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+header{
+  height: 60px;
+  background-color: #BB604A;
+}
+
+.first-block {
+  height: 500px;
+  background-color: #ddd;
+}
+
+.second-block {
+  height: 500px;
+  background-color: #f0f0f0;
+}
+
+.third-block {
+  height: 500px;
+  background-color: #f05f40;
+}
+
+footer{
+  height: 50px;
+  background-color: #000;
+}

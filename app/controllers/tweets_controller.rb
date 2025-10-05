@@ -1,13 +1,29 @@
 class TweetsController < ApplicationController
 
-  before_action :authenticate_user!
+  before_action :authenticate_user! 
 
   def index
-    @tweets = Tweet.all
-    @tweets = @tweets.page(params[:page]).per(3)
+  all_tweets = Tweet.order(created_at: :desc)
+
+  # ① 地図用の変数（全てのデータ）
+  @tweets_for_map = all_tweets
+
+  # ② 一覧表示用の変数（ページ分割したデータ）
+  @tweets_for_list = all_tweets.page(params[:page]).per(10)
         if params[:tag]
           Tag.create(name: params[:tag])
         end
+    if params[:search].present?
+      # あいまい検索で該当する投稿を1件探す
+      searched_tweet = Tweet.find_by('body LIKE ?', "%#{params[:search]}%")
+
+      # 該当する投稿があり、緯度・経度も存在する場合
+      if searched_tweet&.lat.present? && searched_tweet&.lng.present?
+        # ビューで使えるようにインスタンス変数に緯度と経度を格納
+        @searched_lat = searched_tweet.lat
+        @searched_lng = searched_tweet.lng
+      end
+    end
   end
   def new
     @tweet = Tweet.new
@@ -50,6 +66,6 @@ class TweetsController < ApplicationController
   private
 
   def tweet_params
-      params.require(:tweet).permit(:body,:lat,:lng)
+    params.require(:tweet).permit(:name, :body, :image, :lat, :lng, tag_ids: [])
   end
-end
+end 

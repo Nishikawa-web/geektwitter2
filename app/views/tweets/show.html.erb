@@ -1,17 +1,20 @@
-<h1>GeekTwutter</h1>
-<h3>Tweet詳細</h3>
+<h1>保護猫とcafe探し</h1>
+<h3>カフェ詳細</h3>
 <div class="tweet">
     <p><%= @tweet.name %></p>
+    <% if @tweet.image.attached? %>
+      <%= image_tag @tweet.image, size: '600x400' %>
+    <% end %>
     <p><%= @tweet.body %></p>
     <p><%= @tweet.created_at %></p>
     <% if user_signed_in? %>
         <% if current_user.already_liked?(@tweet) %>
         <%= link_to tweet_like_path(@tweet), method: :delete do %>
-        <i class="far fa-heart"></i><%= @tweet.likes.count %>
+        <i class="fa-sharp fa-solid fa-cat"></i><%= @tweet.likes.count %>
         <% end %>
     <% else %>
         <%= link_to tweet_likes_path(@tweet), method: :post do %>
-        <i class="far fa-heart"></i><%= @tweet.likes.count %>
+        <i class="fa-sharp fa-solid fa-cat"></i><%= @tweet.likes.count %>
         <% end %>
     <% end %>
     <% else %>
@@ -20,18 +23,51 @@
     <%= link_to "編集する", edit_tweet_path(@tweet.id) %>
 </div>
 
-<h2>いいねしたユーザー</h2>
+<h2>足跡</h2>
 <% @tweet.liked_users.each do |user| %>
     <li><%= user.email %></li>
 <% end %>
 </div>
+<%# 緯度・経度が投稿に存在する場合のみ地図を表示する %>
+<% if @tweet.lat.present? && @tweet.lng.present? %>
+  
+  <h3>店舗位置</h3>
+  <div id="map"></div>
+
+  <style>
+    #map {
+      height: 200px; /* 地図の高さを指定 */
+      width: 30%;  /* 地図の横幅を指定 */
+    }
+  </style>
+
+  <script>
+    function initMap() {
+      // 表示するツイートの緯度経度をJavaScriptの変数に入れる
+      const tweetLocation = { lat: <%= @tweet.lat.to_f %>, lng: <%= @tweet.lng.to_f %> };
+
+      // tweetLocationを中心に地図を作成
+      const map = new google.maps.Map(document.getElementById('map'), {
+        center: tweetLocation,
+        zoom: 15 // ズームレベルを少し高めに設定
+      });
+
+      // 同じ場所にピンを立てる
+      const marker = new google.maps.Marker({
+        position: tweetLocation,
+        map: map
+      });
+    }
+  </script>
+  
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC-sPnm9UXdKCOD9Q-aPY2wJogqCCuzveg&callback=initMap" async defer></script>
+
+<% end %>
 
 
-
-
-
-<%= link_to "Tweet一覧に戻る", tweets_path %>
-<%= link_to "編集する", edit_tweet_path(@tweet.id) %>
 <% @tweet.tags.each do |tag| %>
     <span><%= tag.name %></span>
 <% end %>
+
+<%= link_to "Tweet一覧に戻る", tweets_path %>
+<%= link_to "編集する", edit_tweet_path(@tweet.id) %>

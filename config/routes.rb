@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "pages/top"
   devise_for :users
   get "hello/index" => "hello#index"
 
@@ -9,13 +10,13 @@ Rails.application.routes.draw do
   get 'tweets/:tweet_id/likes/:id' => 'likes#destroy'
   resources :tweets
 
-  root to: 'tweets#index'
+  root "pages#top"
   resources :tweets do
     resources :likes, only: [:create, :destroy]
   end
 
   get 'maps/index'
-  root to: 'maps#index'
+
   resources :maps, only: [:index]
 
 end
